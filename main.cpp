@@ -9,7 +9,48 @@ void handle_event(gameState *state) {
             case SDL_QUIT:
                 exit(0);
                 break;
-
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.scancode) {
+                    case SDL_SCANCODE_SPACE:
+                        state->accelerating = true;
+                        break;
+                    case SDL_SCANCODE_UP:
+                        state->turning_up = true;
+                        break;
+                    case SDL_SCANCODE_DOWN:
+                        state->turning_down = true;
+                        break;
+                    case SDL_SCANCODE_LEFT:
+                        state->turning_left = true;
+                        break;
+                    case SDL_SCANCODE_RIGHT:
+                        state->turning_right = true;
+                        break;
+                    default:
+                        break;
+                };
+                break;
+            case SDL_KEYUP:
+                switch (event.key.keysym.scancode) {
+                    case SDL_SCANCODE_SPACE:
+                        state->accelerating = false;
+                        break;
+                    case SDL_SCANCODE_UP:
+                        state->turning_up = false;
+                        break;
+                    case SDL_SCANCODE_DOWN:
+                        state->turning_down = false;
+                        break;
+                    case SDL_SCANCODE_LEFT:
+                        state->turning_left = false;
+                        break;
+                    case SDL_SCANCODE_RIGHT:
+                        state->turning_right = false;
+                        break;
+                    default:
+                        break;
+                };
+                break;
             default:
                 break;
         };
@@ -41,6 +82,10 @@ class gameState {
         float player_y;
         float player_z;
         bool accelerating;
+        bool turning_left;
+        bool turning_right;
+        bool turning_up;
+        bool turning_down;
         void render(SDL_Renderer* renderer) {
             //Not implemented
         };
@@ -56,6 +101,10 @@ class gameState {
             this->player_velocity = 0;
             this->object_count = 0;
             this->accelerating = false;
+            this->turning_down = false;
+            this->turning_up = false;
+            this->turning_left = false;
+            this->turning_right = false;
         };
     float player_direction_azimuth;
     float player_direction_inclination;
