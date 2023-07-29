@@ -1,6 +1,67 @@
 #include <SDL2/SDL.h> 
 #include <iostream>
 #include "constants.h"
+#include <math.h>
+
+struct point {
+    float x;
+    float y;
+    float z;
+};
+
+struct flying_object {
+    point points[16];
+    float azimuth;
+    float inclination;
+    float velocity;
+};
+
+float accelerate(float old) {
+    return old;
+};
+
+class gameState {
+    public:
+        float player_x;
+        float player_y;
+        float player_z;
+        bool accelerating;
+        bool turning_left;
+        bool turning_right;
+        bool turning_up;
+        bool turning_down;
+        void render(SDL_Renderer* renderer) {
+            //Not implemented
+        };
+        void update(float delay) {
+            if (accelerating) {
+                this->player_velocity = accelerate(this->player_velocity);
+            };
+            if (this->turning_down || this->turning_left || this->turning_right || this->turning_up) {
+
+            };
+            for (int i = 0; i < this->object_count; i++) {};
+        };
+        void initialise() {
+            this->player_x = 0;
+            this->player_y = 0;
+            this->player_z = 0;
+            this->player_direction_azimuth = 0;
+            this->player_direction_inclination = 0;
+            this->player_velocity = 0;
+            this->object_count = 0;
+            this->accelerating = false;
+            this->turning_down = false;
+            this->turning_up = false;
+            this->turning_left = false;
+            this->turning_right = false;
+        };
+    float player_direction_azimuth;
+    float player_direction_inclination;
+    float player_velocity;
+    flying_object objects[scenario_max_objects];
+    int object_count;
+};
 
 void handle_event(gameState *state) {
     SDL_Event event;
@@ -57,60 +118,46 @@ void handle_event(gameState *state) {
     };
 };
 
-struct point {
-    float x;
-    float y;
-    float z;
-};
-
-struct object {
-    point points[16];
-    float azimuth;
-    float inclination;
-    float velocity;
-};
-
 struct movement_charcteristics {
     float azimuth;
     float inclination;
     float velocity;
 };
 
-class gameState {
-    public:
-        float player_x;
-        float player_y;
-        float player_z;
-        bool accelerating;
-        bool turning_left;
-        bool turning_right;
-        bool turning_up;
-        bool turning_down;
-        void render(SDL_Renderer* renderer) {
-            //Not implemented
-        };
-        void update(float delay) {
-            //Not implemented
-        };
-        void initialise() {
-            this->player_x = 0;
-            this->player_y = 0;
-            this->player_z = 0;
-            this->player_direction_azimuth = 0;
-            this->player_direction_inclination = 0;
-            this->player_velocity = 0;
-            this->object_count = 0;
-            this->accelerating = false;
-            this->turning_down = false;
-            this->turning_up = false;
-            this->turning_left = false;
-            this->turning_right = false;
-        };
-    float player_direction_azimuth;
-    float player_direction_inclination;
-    float player_velocity;
-    object objects[scenario_max_objects];
-    int object_count;
+point to_cartesian_velocities(movement_charcteristics* angular) {
+    point out;
+    out.x = angular->velocity * sin(angular->azimuth) * cos(angular->inclination);
+    out.y = angular->velocity * sin(angular->azimuth) * sin(angular->inclination);
+    out.z = angular->velocity * sin(angular->inclination);
+    return out;
+};
+
+float sign(float a) {
+    return a > 0 ? 1.0 : a < 0 ? -1.0 : 0.0;
+};
+
+movement_charcteristics to_polar_velocities(point* cartesian) {
+    movement_charcteristics out;
+    float r = sqrt(cartesian->x * cartesian->x + cartesian->y * cartesian->y + cartesian->z * cartesian->z);
+    out.velocity = r;
+    out.inclination = r == 0 ? 0 : acos(cartesian->z/r);
+    out.azimuth = (cartesian->x == 0 && cartesian->y == 0) ? 0 : sign(cartesian->y) * 
+        acos(cartesian->x / sqrt(cartesian->x * cartesian->x + cartesian->y * cartesian->y));
+    return out;
+};
+
+movement_charcteristics add_velocities(movement_charcteristics* a, movement_charcteristics* b) { //https://en.wikipedia.org/wiki/Velocity-addition_formula#Special_relativity
+    point vector_a = to_cartesian_velocities(a);
+    point vector_b = to_cartesian_velocities(b);
+    float divisor = 1 + ((vector_a.x * vector_b.x + vector_a.y * vector_b.y + vector_a.z * vector_b.z)
+     / (speed_of_light * speed_of_light));
+    point vector_sum = {
+        x: (vector_a.x + vector_b.x) / divisor,
+        y: (vector_a.y + vector_b.y) / divisor,
+        z: (vector_a.z + vector_b.z) / divisor
+    };
+    movement_charcteristics out = to_polar_velocities(&vector_sum);
+    return out;
 };
 
 int main(int argc, char *argv[]) {  

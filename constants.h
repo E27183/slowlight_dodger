@@ -8,5 +8,8 @@ const float boundary_z_high = 10000.0;
 
 const float speed_of_light = 10.0;
 
+const float forward_thruster_power = 1.0;
+const float angular_thruster_power = 0.5;
+
 const int scenario_max_objects = 256;
 const int millisecond_frame_delay = 100;
