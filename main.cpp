@@ -1,4 +1,49 @@
-#include <SDL2/SDL.h>  
+#include <SDL2/SDL.h> 
+#include <iostream>
+#include "constants.h"
+
+void handle_event() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT:
+                exit(0);
+                break;
+
+            default:
+                break;
+        };
+    };
+};
+
+struct object {
+    float x;
+    float y;
+    float z;
+    float azimuth;
+    float inclination;
+    float velocity;
+};
+
+struct movement_charcteristics {
+    float azimuth;
+    float inclination;
+    float velocity;
+};
+
+class gameState {
+    public:
+        float player_x;
+        float player_y;
+        float player_z;
+        void render(SDL_Renderer* renderer) {
+            //Not implemented
+        };
+    float player_direction_azimuth;
+    float player_direction_inclination;
+    float player_velocity;
+    object objects[256];
+};
 
 int main(int argc, char *argv[]) {  
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {  
