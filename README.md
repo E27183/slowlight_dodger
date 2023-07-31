@@ -6,3 +6,6 @@ To move:
 
  - Press space to accelerate forwards.
  - Press the left, right, up and down keys to steer in that direction.
+
+
+ # Note: This is currently in progress and not yet playable

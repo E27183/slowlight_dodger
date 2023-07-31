@@ -11,7 +11,7 @@ struct point {
 
 struct flying_object {
     point points[16];
-    float azimuth;
+    float azimuth; //Properties are with respect to the reference frame and are converted to the players perspective in real time during updates
     float inclination;
     float velocity;
 };
@@ -20,18 +20,23 @@ float accelerate(float old) {
     return old;
 };
 
+point* to_render_points(flying_object* obj, point* relative_distance, movement_charcteristics* facing) {
+    point out[16];
+    
+};
+
 class gameState {
     public:
-        float player_x;
+        float player_x; //Distances are from the 0,0,0 point to the player, using the PLAYERS perspective on length
         float player_y;
         float player_z;
-        bool accelerating;
+        bool accelerating; //All time and velocity is from the player's perspective assuming 0,0,0 is stationary
         bool turning_left;
         bool turning_right;
         bool turning_up;
         bool turning_down;
         void render(SDL_Renderer* renderer) {
-            //Not implemented
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         };
         void update(float delay) {
             if (accelerating) {
@@ -124,7 +129,7 @@ struct movement_charcteristics {
     float velocity;
 };
 
-point to_cartesian_velocities(movement_charcteristics* angular) {
+point to_cartesian(movement_charcteristics* angular) {
     point out;
     out.x = angular->velocity * sin(angular->azimuth) * cos(angular->inclination);
     out.y = angular->velocity * sin(angular->azimuth) * sin(angular->inclination);
@@ -136,7 +141,7 @@ float sign(float a) {
     return a > 0 ? 1.0 : a < 0 ? -1.0 : 0.0;
 };
 
-movement_charcteristics to_polar_velocities(point* cartesian) {
+movement_charcteristics to_polar(point* cartesian) {
     movement_charcteristics out;
     float r = sqrt(cartesian->x * cartesian->x + cartesian->y * cartesian->y + cartesian->z * cartesian->z);
     out.velocity = r;
@@ -147,8 +152,8 @@ movement_charcteristics to_polar_velocities(point* cartesian) {
 };
 
 movement_charcteristics add_velocities(movement_charcteristics* a, movement_charcteristics* b) { //https://en.wikipedia.org/wiki/Velocity-addition_formula#Special_relativity
-    point vector_a = to_cartesian_velocities(a);
-    point vector_b = to_cartesian_velocities(b);
+    point vector_a = to_cartesian(a);
+    point vector_b = to_cartesian(b);
     float divisor = 1 + ((vector_a.x * vector_b.x + vector_a.y * vector_b.y + vector_a.z * vector_b.z)
      / (speed_of_light * speed_of_light));
     point vector_sum = {
@@ -156,13 +161,13 @@ movement_charcteristics add_velocities(movement_charcteristics* a, movement_char
         y: (vector_a.y + vector_b.y) / divisor,
         z: (vector_a.z + vector_b.z) / divisor
     };
-    movement_charcteristics out = to_polar_velocities(&vector_sum);
+    movement_charcteristics out = to_polar(&vector_sum);
     return out;
 };
 
 int main(int argc, char *argv[]) {  
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {  
-                printf("error initializing SDL: %s\n", SDL_GetError());  
+        printf("error initializing SDL: %s\n", SDL_GetError());  
     };
     SDL_DisplayMode DisplayMode;
     SDL_GetCurrentDisplayMode(0, &DisplayMode);
