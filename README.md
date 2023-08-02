@@ -1,5 +1,5 @@
-# Note: Due to difficulties in understanding physics, development on this project has moved to https://github.com/E27183/normallight_dodger
-# If you were directed to this by it being included on my resume please look at the other project instead as it has developed further 
+### Note: Due to difficulties in understanding physics, development on this project has moved to https://github.com/E27183/normallight_dodger
+### If you were directed to this by it being included on my resume please look at the other project instead as it has developed further 
 
 ## SLOWLIGHT
 
